@@ -1,0 +1,208 @@
+﻿<wpfui:FluentWindow x:Class="FileHashGeneratorAndValidator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileHashGeneratorAndValidator"
+        xmlns:wpfui="http://schemas.lepo.co/wpfui/2022/xaml"
+        mc:Ignorable="d"
+        WindowBackdropType="Mica"
+        ExtendsContentIntoTitleBar="True"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        FlowDirection="LeftToRight"
+        Title="File hash generator and Validator">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <wpfui:TitleBar
+            Title="File hash generator and Validator"
+            ShowClose="True"
+            ShowMaximize="true"/>
+
+        <StackPanel Grid.Row="1">
+            <wpfui:Button
+                ToolTip="Visit GitHub Repository"
+                Click="OnVisitGitHubRepositoryClick">
+                <wpfui:SymbolIcon
+                    Symbol="Code24"
+                    FontSize="24"/>
+            </wpfui:Button>
+
+        </StackPanel>
+        
+        <Border
+            Grid.Row="2"
+            BorderThickness="2"
+            Visibility="{Binding IsMessageVisible, Converter={StaticResource BoolToVisibilityConverter}}"
+            Background="{Binding MessageBackground}"
+            BorderBrush="{Binding MessageBorderBrush}"
+            Margin="10"
+            Padding="10"
+            CornerRadius="5">
+            <StackPanel
+                HorizontalAlignment="Center">
+                <wpfui:TextBlock
+                    Text="{Binding MessageTitle, UpdateSourceTrigger=PropertyChanged}"
+                    FontSize="16"
+                    TextAlignment="Center"/>
+                <wpfui:TextBlock
+                    Text="{Binding Message, UpdateSourceTrigger=PropertyChanged}"
+                    FontSize="14"
+                    TextAlignment="Center"/>
+            </StackPanel>
+        </Border>
+        
+        <wpfui:Card
+            Grid.Row="3"
+            VerticalAlignment="Top"
+            Margin="5">
+        <ScrollViewer>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="10*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Border
+                    CornerRadius="8"
+                    BorderBrush="AliceBlue"
+                    BorderThickness="2"
+                    Grid.ColumnSpan="2"
+                    Cursor="Hand"
+                    Background="Transparent"
+                    Padding="20"
+                    MouseEnter="FileUploadArea_MouseEnter"
+                    MouseLeave="FileUploadArea_MouseLeave"
+                    x:Name="FileUploadArea"
+                    MouseLeftButtonUp="FileUploadArea_MouseLeftButtonUp"
+                    AllowDrop="True"
+                    Drop="FileUploadArea_Drop"
+                    PreviewDragOver="FileUploadArea_PreviewDragOver"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}">
+                    <StackPanel Orientation="Vertical">
+                        <wpfui:SymbolIcon Symbol="ArrowUp28" FontSize="48" Margin="5"/>
+                        <wpfui:TextBlock
+                            Text="Click to upload or drag and drop a file"
+                            HorizontalAlignment="Center"
+                            FontSize="14"
+                            Margin="5"/>
+                        <wpfui:TextBlock
+                            Text="Any file type supported"
+                            HorizontalAlignment="Center"
+                            Foreground="Gray"
+                            FontSize="12"
+                            Margin="5"/>
+
+                        <wpfui:TextBlock
+                            HorizontalAlignment="Center"
+                            Foreground="Gray"
+                            FontSize="15"
+                            Margin="5"
+                            Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                </Border>
+
+                <wpfui:TextBlock
+                    Grid.Row="2"
+                    Text="Algorithm : "
+                    VerticalAlignment="Center"/>
+                    <ComboBox
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        ItemsSource="{Binding SupportedAlgorithms}"
+                        SelectedItem="{Binding SelectedAlgorithm, UpdateSourceTrigger=PropertyChanged}">
+                    </ComboBox>
+
+                <wpfui:TextBlock
+                    Grid.Row="4"
+                    Text="Expected hash : "
+                    VerticalAlignment="Center"/>
+                <wpfui:TextBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
+                    Text="{Binding ExpectedHash, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <StackPanel
+                    Grid.Row="6"
+                    Grid.ColumnSpan="2"
+                    Orientation="Horizontal">
+                    <wpfui:Button
+                        Content="Calculate Hash"
+                         Command="{Binding CalculateHashCommand}"
+                        IsEnabled="{Binding CanCalculateHash}"
+                        Appearance="Primary"
+                        Margin="5"/>
+                    <wpfui:Button
+                        Content="Start Check"
+                        Command="{Binding StartCheckCommand}"
+                        IsEnabled="{Binding CanStartCheck}"
+                        Appearance="Primary"
+                        Margin="5"/>
+
+                    <wpfui:Button
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        IsEnabled="{Binding IsBusy}"
+                        Appearance="Danger"
+                        Margin="5"/>
+                </StackPanel>
+
+                <StackPanel
+                        Grid.Row="8"
+                        Grid.ColumnSpan="2"
+                        VerticalAlignment="Bottom"
+                        Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                    <wpfui:TextBlock
+                        Text="{Binding ProgressValueString, UpdateSourceTrigger=PropertyChanged}"
+                        Margin="5"/>
+                    <ProgressBar
+                        Height="5"
+                        Margin="5"
+                        Minimum="0"
+                        Maximum="100"
+                        Value="{Binding ProgressValue, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+                
+                <StackPanel
+                        Grid.Row="10"
+                        Grid.ColumnSpan="2"
+                        VerticalAlignment="Bottom"
+                        Orientation="Horizontal"
+                    Visibility="{Binding IsGeneratedFileHashVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <wpfui:TextBlock
+                        Text="{Binding GeneratedFileHash, UpdateSourceTrigger=PropertyChanged}"
+                        Margin="5"/>
+
+                    <wpfui:SymbolIcon
+                        Symbol="Copy24"
+                        x:Name="CopyButton"
+                        MouseLeftButtonUp="CopyButton_MouseLeftButtonUp"
+                        Cursor="Hand"/>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+        </wpfui:Card>
+    </Grid>
+</wpfui:FluentWindow>
