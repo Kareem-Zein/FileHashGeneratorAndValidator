@@ -269,14 +269,16 @@ Potential future improvements may include:
 
 The roadmap may change as the project evolves.
 
-## License
+## License & Third-Party Notices
 
 This project is licensed under the **MIT License**.
 
 See the [LICENSE](LICENSE) file for the full license text.
 
-##Acknowledgments
-* Built with [WPF-UI] (https://github.com/lepoco/wpfui) for modern Fluent Design UI components (MIT License).
+For details regarding third-party software licenses, see the [THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt)
+
+## Acknowledgments
+* Built with [WPF-UI](https://github.com/lepoco/wpfui) for modern Fluent Design UI components (MIT License).
 
 ## Disclaimer
 
