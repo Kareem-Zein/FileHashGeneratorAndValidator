@@ -275,6 +275,9 @@ This project is licensed under the **MIT License**.
 
 See the [LICENSE](LICENSE) file for the full license text.
 
+##Acknowledgments
+* Built with [WPF-UI] (https://github.com/lepoco/wpfui) for modern Fluent Design UI components (MIT License).
+
 ## Disclaimer
 
 This application is provided as an integrity verification utility.
