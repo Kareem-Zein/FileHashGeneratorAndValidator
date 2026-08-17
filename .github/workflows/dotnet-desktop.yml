@@ -1,0 +1,59 @@
+name: Build, Sign, and Release
+
+on:
+  push:
+    tags:
+      - 'v*' # يتفعل التدفّق تلقائياً عند إنشاء Tag جديد مثل v1.0.1
+
+permissions:
+  contents: write # صلاحية إنشاء الـ Release ورفع الملفات
+
+jobs:
+  build-sign-release:
+    runs-on: windows-latest
+
+    steps:
+    # 1. جلب الكود المصدري
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # 2. إعداد بيئة .NET 8
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.301'
+
+    # 3. استعادة الحزم (NuGet Packages)
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    # 4. تجميع وبناء التطبيق (Single-File Self-Contained)
+    - name: Publish Executable
+      run: |
+        dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ./publish
+
+    # 5. التوقيع الرقمي عبر SignPath (سيتم تفعيل هذه الخطوة فور استلام الـ Token)
+    #- name: Submit for Signing via SignPath
+    #  uses: signpath/github-action-submit-signing-request@v1
+    #  with:
+    #    api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+    #    organization-id: 'YOUR_ORGANIZATION_ID' # استبدلها بـ ID المنظمة الخاص بك في SignPath
+    #    project-slug: 'FileHashGeneratorAndValidator'
+    #    signing-policy-slug: 'release-signing'
+    #    artifact-path: './publish/FileHashGeneratorAndValidator.exe'
+    #    wait-for-completion: true
+
+    # 6. ضغط مخرجات النشر بعد التوقيع
+    - name: Compress Release Artifacts
+      shell: pwsh
+      run: |
+        Compress-Archive -Path ./publish/* -DestinationPath ./FileHashGeneratorAndValidator-win-x64.zip
+
+    # 7. إنشاء Release على GitHub ورفع الملف
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: FileHashGeneratorAndValidator-win-x64.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
