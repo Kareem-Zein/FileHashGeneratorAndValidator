@@ -1,7 +1,7 @@
 ﻿using FileHashGeneratorAndValidator.Core;
-using FileHashGeneratorAndValidator.Enums;
 using FileHashGeneratorAndValidator.Models;
 using FileHashGeneratorAndValidator.Services;
+using KZ.FileHash.Enums;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -61,7 +61,7 @@ namespace FileHashGeneratorAndValidator.ViewsModels
             set => Set(ref field, value);
         }
 
-        public HashAlgorithm SelectedAlgorithm
+        public HashAlgorithmType SelectedAlgorithm
         {
             get => field;
             set
@@ -70,9 +70,9 @@ namespace FileHashGeneratorAndValidator.ViewsModels
                 OnPropertyChanged(nameof(CanCalculateHash));
                 OnPropertyChanged(nameof(CanStartCheck));
             }
-        } = HashAlgorithm.None;
+        } = HashAlgorithmType.None;
 
-        public ObservableCollection<HashAlgorithm> SupportedAlgorithms
+        public ObservableCollection<HashAlgorithmType> SupportedAlgorithms
         {
             get => field;
         } = [];
@@ -113,7 +113,7 @@ namespace FileHashGeneratorAndValidator.ViewsModels
         }
 
         private bool AllowStartTask
-            => !string.IsNullOrEmpty(FilePath) && SelectedAlgorithm != HashAlgorithm.None && !IsBusy;
+            => !string.IsNullOrEmpty(FilePath) && SelectedAlgorithm != HashAlgorithmType.None && !IsBusy;
 
         public bool CanCalculateHash
             => AllowStartTask && string.IsNullOrEmpty(ExpectedHash);
@@ -159,7 +159,7 @@ namespace FileHashGeneratorAndValidator.ViewsModels
 
         private void FillAlgorithms()
         {
-            foreach (var value in Enum.GetValues<HashAlgorithm>())
+            foreach (var value in Enum.GetValues<HashAlgorithmType>())
                 SupportedAlgorithms.Add(value);
         }
 

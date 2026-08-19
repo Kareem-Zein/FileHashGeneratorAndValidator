@@ -1,30 +1,38 @@
 # File Hash Generator and Validator
 
-A simple Windows desktop application for generating file hashes and verifying files against an expected checksum.
+[![NuGet Version](https://img.shields.io/nuget/v/KZ.FileHash.svg?style=flat-square&color=blue)](https://www.nuget.org/packages/KZ.FileHash)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-File Hash Generator and Validator allows you to calculate the hash of any file using a selected hashing algorithm, or verify a file against a checksum provided by the file publisher.
+Starting from version `1.0.0.1`, we relied on my open-source library [KZ.FileHash](https://www.nuget.org/packages/KZ.FileHash)
 
-The application processes files incrementally instead of loading the entire file into memory, making it suitable for large files as well.
+A simple, ultra-fast Windows desktop application for generating file hashes and verifying files against expected checksums.
+
+File Hash Generator and Validator allows you to calculate hashes using a selected algorithm or verify files against publisher checksums. Built on top of custom high-performance architecture, it processes files in a streaming, low-allocation fashion without clogging system memory.
+
+---
+
+## 🛠️ Powered By Internal Packages
+
+This application relies on our standalone, custom-built open-source hashing engine:
+
+* **[KZ.FileHash](https://www.nuget.org/packages/KZ.FileHash)** `v1.0.0` — *High-performance, zero-allocation multi-hashing core built using `ArrayPool<byte>` and single-pass streaming architecture for .NET 8+.*
+
+---
 
 ## Features
 
-* Generate hashes for any file.
-* Verify a file against an expected hash.
-* Supports multiple hashing algorithms.
-* Supports drag and drop file selection.
-* Displays the generated hash after processing.
-* Copy the generated hash to the clipboard.
-* Progress reporting based on the amount of data processed.
-* Cancel hash generation or verification while the operation is running.
-* Validates the expected hash length before starting verification.
-* Suggests compatible algorithms when the expected hash length does not match the selected algorithm.
-* Processes files incrementally without loading the entire file into memory.
-* Works with large files.
-* Files are processed locally and are never uploaded or transmitted.
+* **Zero-Allocation File Processing:** Incremental stream reading using zero-allocation byte buffers via `ArrayPool<byte>`.
+* **Single-Pass Engine:** Compute or verify multiple algorithms in a single pass over the file stream.
+* **Generate & Verify Hashes:** Calculate hashes or check integrity against expected publisher checksums.
+* **Algorithm Auto-Suggestion:** Validates hash lengths beforehand and suggests matching algorithms if a mismatch is detected.
+* **Modern Algorithms:** Full support for standard SHA-2, MD5, SHA-1, and modern **SHA-3** families.
+* **Drag and Drop UI:** Fluent Design interface with full drag-and-drop file selection.
+* **Progress & Cancellation:** Real-time percentage tracking via `IProgress<double>` and full operation cancellation via `CancellationToken`.
+* **100% Offline & Private:** All operations occur locally on your machine.
+
+---
 
 ## Supported Algorithms
-
-The application currently supports:
 
 * MD5
 * SHA-1
@@ -35,118 +43,54 @@ The application currently supports:
 * SHA3-384
 * SHA3-512
 
+---
+
 ## Why This Project?
 
-When downloading software or other files from the internet, publishers often provide a checksum for the file.
+When downloading software or large files from the internet, publishers often provide a checksum (such as SHA-256 or SHA3-256).
 
-For example, a software website may provide a SHA-256 checksum alongside a download.
-
-After downloading the file, you can use this application to calculate the hash of the downloaded file and compare it with the checksum provided by the publisher.
-
-If the hashes match, the file content matches the expected checksum.
-
-This can help detect accidental corruption or unexpected modifications to a downloaded file.
+This application allows you to verify file integrity locally, protecting your downloads against accidental corruption or file tampering without relying on heavy third-party software or online tools.
 
 > **Important:** Hash verification confirms that the calculated hash matches the expected hash. It does not by itself prove that the file or the published checksum came from a trusted source.
 
+---
+
 ## How It Works
 
-The application has two main modes.
-
 ### Generate Hash
-
-When the expected hash field is empty:
-
-1. Select a file.
-2. Select the hashing algorithm.
+1. Select or drag-and-drop a file.
+2. Choose your desired hashing algorithm.
 3. Click **Calculate Hash**.
-4. The application reads the file incrementally and calculates its hash.
-5. The generated hash is displayed and can be copied to the clipboard.
-
-The expected hash is not required when generating a hash.
+4. Copy the generated hash directly to your clipboard.
 
 ### Verify Hash
-
-When an expected hash is entered:
-
-1. Select a file.
+1. Select a file and enter the publisher's checksum in the **Expected Hash** field.
 2. Select the hashing algorithm.
-3. Enter the expected hash.
-4. Click **Start Check**.
-5. The application first validates the expected hash length against the selected algorithm.
-6. If the length is valid, the file is processed and its hash is calculated.
-7. The generated hash is compared with the expected hash.
-8. The result is displayed to the user.
+3. Click **Start Check**.
+4. The system validates the hash length first. If valid, it computes the hash and performs a case-insensitive comparison.
 
-The comparison is case-insensitive, so uppercase and lowercase hexadecimal characters are treated as equivalent.
+---
 
-Whitespace and prefixes such as `0x` are not normalized.
+## Large File & Memory Performance
 
-## Hash Length Validation
+The application does not load entire files into system RAM.
 
-Before calculating a hash during verification, the application checks whether the expected hash has the correct length for the selected algorithm.
+By leveraging **`KZ.FileHash`**, file data is processed incrementally in buffered chunks below the Large Object Heap (LOH) threshold. Memory allocations remain low and constant regardless of file size.
 
-For example, if a SHA-384 algorithm is selected but the entered hash has a length corresponding to SHA-512, the verification does not start.
+* Tested successfully on large files (**3 GB+**) without memory spikes or UI freezing.
 
-Instead, the application informs the user about the expected length and suggests algorithms that generate hashes of the same length.
+---
 
-This helps prevent accidentally selecting the wrong hashing algorithm when verifying a downloaded file.
+## Technology Stack
 
-## Large File Support
+* **Language:** C# 14
+* **Target Framework:** .NET 10
+* **UI Framework:** WPF with [WPF-UI](https://github.com/lepoco/wpfui) (Fluent Design)
+* **Core Engine:** [KZ.FileHash](https://www.nuget.org/packages/KZ.FileHash) NuGet Package
+* **Architecture:** MVVM (Model-View-ViewModel)
+* **Asynchronous & Threading:** `Async/Await`, `CancellationToken`, `IProgress<double>`
 
-The application does not load the entire file into memory.
-
-File data is read incrementally in chunks of **80 KB** and passed to the hashing process as it is read.
-
-The application uses .NET's `IncrementalHash` API to calculate the hash incrementally.
-
-This approach allows the application to process large files without requiring memory proportional to the file size.
-
-The application has no application-defined maximum file size.
-
-For example, a 3 GB file has been successfully processed without freezing the application.
-
-Actual processing time depends on factors such as file size and storage performance.
-
-## Progress Reporting
-
-While generating or verifying a hash, the application displays a progress indicator based on:
-
-```text
-Bytes processed / Total file size
-```
-
-The progress represents how much of the file has already been read and processed.
-
-The progress indicator disappears when the operation finishes or is cancelled.
-
-## Cancellation
-
-Hash generation and verification can be cancelled while an operation is in progress.
-
-Cancellation is implemented using `CancellationToken`, which is passed to the asynchronous file-reading operation.
-
-Once the operation is cancelled, the application stops processing and displays a cancellation message.
-
-Cancellation is only available while an operation is running.
-
-## Privacy
-
-All file processing is performed locally on the user's computer.
-
-The application:
-
-* Does not upload files.
-* Does not send file contents to a server.
-* Does not require an online service to calculate hashes.
-* Does not modify the file being processed.
-
-The application only reads the selected file to calculate its hash.
-
-## Requirements
-
-* Windows
-* .NET 10 SDK
+---
 
 ## Getting Started
 
@@ -184,17 +128,11 @@ FileHashGeneratorAndValidator/
 │   ├── Bindable.cs
 │   └── RelayCommand.cs
 │
-├── Enums/
-│   └── HashAlgorithm.cs
-│
-├── Helpers/
-│   └── AlgorithmsHelper.cs
-│
 ├── Models/
 │   └── HashOperationResult.cs
 │
 ├── Services/
-│   └── FileHashService.cs
+│   └── FileHashService.cs --> Integrated with KZ.FileHash Engine
 │
 ├── ViewModels/
 │   └── MainWindowViewModel.cs
@@ -205,38 +143,6 @@ FileHashGeneratorAndValidator/
 ├── MainWindow.xaml
 └── MainWindow.xaml.cs
 ```
-
-### Main Components
-
-**MainWindow.xaml**
-
-Contains the application's user interface.
-
-**MainWindowViewModel**
-
-Handles the UI state, commands, user interactions, and application workflow.
-
-**FileHashService**
-
-Responsible for reading files and generating hashes.
-
-The service processes files incrementally using `IncrementalHash` rather than loading the complete file into memory.
-
-**HashAlgorithm**
-
-Defines the hashing algorithms supported by the application.
-
-## Technology Stack
-
-* C# 14
-* .NET 10
-* WPF
-* WPF-UI
-* MVVM
-* `System.Security.Cryptography`
-* `IncrementalHash`
-* `CancellationToken`
-* Asynchronous file I/O
 
 ## Releases
 
@@ -279,6 +185,7 @@ For details regarding third-party software licenses, see the [THIRD-PARTY-NOTICE
 
 ## Acknowledgments
 * Built with [WPF-UI](https://github.com/lepoco/wpfui) for modern Fluent Design UI components (MIT License).
+* [KZ.FileHash](https://github.com/Kareem-Zein/KZ.FileHash) Custom open-source multi-hashing enging Built by [Kareem Zein](https://kareem-zein.com)
 
 ## Disclaimer
 
