@@ -22,10 +22,8 @@ This application relies on our standalone, custom-built open-source hashing engi
 ## Features
 
 * **Zero-Allocation File Processing:** Incremental stream reading using zero-allocation byte buffers via `ArrayPool<byte>`.
-* **Single-Pass Engine:** Compute or verify multiple algorithms in a single pass over the file stream.
 * **Generate & Verify Hashes:** Calculate hashes or check integrity against expected publisher checksums.
 * **Algorithm Auto-Suggestion:** Validates hash lengths beforehand and suggests matching algorithms if a mismatch is detected.
-* **Modern Algorithms:** Full support for standard SHA-2, MD5, SHA-1, and modern **SHA-3** families.
 * **Drag and Drop UI:** Fluent Design interface with full drag-and-drop file selection.
 * **Progress & Cancellation:** Real-time percentage tracking via `IProgress<double>` and full operation cancellation via `CancellationToken`.
 * **100% Offline & Private:** All operations occur locally on your machine.
