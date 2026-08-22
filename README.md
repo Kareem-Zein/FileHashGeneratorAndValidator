@@ -15,7 +15,7 @@ File Hash Generator and Validator allows you to calculate hashes using a selecte
 
 This application relies on our standalone, custom-built open-source hashing engine:
 
-* **[KZ.FileHash](https://www.nuget.org/packages/KZ.FileHash)** `v1.0.0` — *High-performance, zero-allocation multi-hashing core built using `ArrayPool<byte>` and single-pass streaming architecture for .NET 10
+* **[KZ.FileHash](https://www.nuget.org/packages/KZ.FileHash)** `v1.0.0` — *High-performance, zero-allocation multi-hashing core built using `ArrayPool<byte>` and single-pass streaming architecture.
 
 ---
 
